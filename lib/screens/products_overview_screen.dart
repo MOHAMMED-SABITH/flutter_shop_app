@@ -21,6 +21,27 @@ class ProductOverviewScreen extends StatefulWidget {
 
 class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   var _showFavotitesOnly = false;
+  var _isInit = true;
+  var _isLoading = false;
+  @override
+  void initState() {
+    setState(() {
+      _isLoading = true;
+    });
+    Provider.of<Products>(context, listen: false)
+        .fetchAndSetProducts()
+        .then((_) {
+      setState(() {
+        _isLoading = false;
+      });
+    }); //Won't work
+
+    // Future.delayed(Duration.zero).then((_) {
+    //   Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+    // });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     // print(Provider.of<Cart>(context).itemCount);
@@ -67,7 +88,11 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
         ],
       ),
       drawer: const AppDrawer(),
-      body: ProductGrid(_showFavotitesOnly),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductGrid(_showFavotitesOnly),
     );
   }
 }
